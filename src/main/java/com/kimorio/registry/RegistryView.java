@@ -25,6 +25,7 @@ package com.kimorio.registry;
 
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 /**
@@ -50,5 +51,15 @@ public interface RegistryView<K, V> {
    * @return a reference
    * @since 1.0.0
    */
-  @NotNull Reference<V> get(final @NotNull K key);
+  @Nullable Reference<V> get(final @NotNull K key);
+
+  /**
+   * Gets a reference by its key, or creates a new reference.
+   *
+   * @param key the key
+   * @return a reference
+   * @since 1.0.0
+   */
+  @SuppressWarnings("checkstyle:MethodName")
+  @NotNull Reference<V> getOrCreate(final @NotNull K key);
 }

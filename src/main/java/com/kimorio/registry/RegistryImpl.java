@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import static java.util.Objects.requireNonNull;
@@ -42,15 +43,28 @@ final class RegistryImpl<K, V> implements Registry<K, V> {
   }
 
   @Override
-  public @NotNull Reference<V> get(final @NotNull K key) {
+  public @Nullable Reference<V> get(final @NotNull K key) {
+    return this.reference(key, false);
+  }
+
+  @Override
+  public @NotNull Reference<V> getOrCreate(final @NotNull K key) {
+    return this.reference(key, true);
+  }
+
+  private @UnknownNullability Reference<V> reference(final @NotNull K key, final boolean create) {
     requireNonNull(key, "key");
 
     @Nullable Reference<V> reference = this.byKey.get(key);
+
     if (reference == null) {
-      // No value has been registered for the given key yet - creating a lazy reference here
-      // allows us to provide a way to access the value once it has been registered later on.
-      reference = new References.Lazy<>(key);
-      this.byKey.put(key, reference);
+      // Only create a new reference when requested
+      if (create) {
+        // No value has been registered for the given key yet - creating a lazy reference here
+        // allows us to provide a way to access the value once it has been registered later on.
+        reference = new References.Lazy<>(key);
+        this.byKey.put(key, reference);
+      }
     }
 
     return reference;

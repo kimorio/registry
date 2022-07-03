@@ -41,6 +41,13 @@ class RegistryTest {
   private final Registry<String, Item> registry = Registry.create();
 
   @Test
+  void testGetBeforeGetOrCreate() {
+    assertNull(this.registry.get(EMPTY));
+    final Reference<Item> reference = this.registry.getOrCreate(EMPTY);
+    assertSame(reference, this.registry.get(EMPTY)); // get should now return the (unbound) reference we created
+  }
+
+  @Test
   void testImmediate() {
     final Item item = new Item();
 
@@ -63,7 +70,7 @@ class RegistryTest {
 
   @Test
   void testLazy() {
-    final Reference<Item> holderBeforeRegistration = this.registry.get(EMPTY);
+    final Reference<Item> holderBeforeRegistration = this.registry.getOrCreate(EMPTY);
 
     // The registry should contain the key even when a value is not bound.
     assertThat(this.registry.keys()).containsExactly(EMPTY);
